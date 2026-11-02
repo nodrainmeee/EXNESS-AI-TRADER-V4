@@ -1,0 +1,27 @@
+{
+  "symbols": [
+    "EURUSD",
+    "XAUUSD"
+  ],
+  "timeframe": "M5",
+  "risk_percent": 1.0,
+  "atr_sl_mult": 1.5,
+  "rr": 1.5,
+  "adx_min": 20,
+  "rsi_buy": 45,
+  "rsi_sell": 55,
+  "max_spread_sl_ratio": 0.12,
+  "max_open_per_symbol": 1,
+  "max_total_open": 2,
+  "max_trades_per_day": 6,
+  "daily_loss_limit_percent": 3.0,
+  "session_start_hour": 7,
+  "session_end_hour": 20,
+  "breakeven_at_r": 1.0,
+  "check_interval_seconds": 0.25,
+  "deviation_points": 20,
+  "magic": 26110201,
+  "strategy": "pullback",
+  "check_interval_ms": 250,
+  "execution_mode": "signals"
+}
