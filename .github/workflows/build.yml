@@ -1,0 +1,73 @@
+
+name: EXNESS AI TRADER V4 - Windows Build
+
+on:
+  push:
+    branches: [main, master]
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Recuperer le projet
+        uses: actions/checkout@v4
+
+      - name: Installer Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          architecture: x64
+
+      - name: Installer les dependances
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Compiler application V4
+        run: |
+          pyinstaller --noconfirm --clean --onefile --windowed `
+            --name EXNESS_AI_TRADER_V4 `
+            --paths src `
+            --collect-all MetaTrader5 `
+            src/app.py
+
+      - name: Compiler outils V4
+        run: |
+          pyinstaller --noconfirm --clean --onefile --console `
+            --name EXNESS_AI_TRADER_V4_TOOLS `
+            --paths src `
+            --collect-all MetaTrader5 `
+            src/tools.py
+
+      - name: Creer le package Windows
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force EXNESS_AI_TRADER_V4/logs
+          Copy-Item dist/EXNESS_AI_TRADER_V4.exe EXNESS_AI_TRADER_V4/
+          Copy-Item dist/EXNESS_AI_TRADER_V4_TOOLS.exe EXNESS_AI_TRADER_V4/
+          Copy-Item config.json EXNESS_AI_TRADER_V4/
+          Copy-Item README_FR.md EXNESS_AI_TRADER_V4/
+
+          Compress-Archive `
+            -Path EXNESS_AI_TRADER_V4/* `
+            -DestinationPath EXNESS_AI_TRADER_V4_WINDOWS.zip `
+            -Force
+
+      - name: Publier les fichiers
+        uses: actions/upload-artifact@v4
+        with:
+          name: EXNESS_AI_TRADER_V4_WINDOWS
+          path: EXNESS_AI_TRADER_V4_WINDOWS.zip
+
+      - name: Creer une Release GitHub
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: EXNESS_AI_TRADER_V4_WINDOWS.zip
